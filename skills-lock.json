@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "embody": {
+      "source": "embodyapp/embody",
+      "sourceType": "github",
+      "skillPath": "skills/embody/SKILL.md",
+      "computedHash": "50f0d140cb7ca573ecbc6f6bf433884e4989bcd1b1a60ff2bf4404e17f3e1754"
+    },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "9cdbb4b8f7a3aeaef82e6230c9e823500d4a8a1214c726cf342cf9829d34fc7d"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "computedHash": "9ce12c4a1e209e557fcf9d02086ade3d7ffdb976186018fc1b063b4164246004"
+    },
+    "teach": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/teach/SKILL.md",
+      "computedHash": "b8a69574c7a019bed84e84313dc8bf02e1d1bf925ba43057d433217c63863206"
+    }
+  }
+}

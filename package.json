@@ -1,0 +1,31 @@
+{
+  "name": "embody-apps",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.6",
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@embody/auth": "file:.embody/framework/auth",
+      "@embody/cli": "file:.embody/framework/cli",
+      "@embody/cloud-contracts": "file:.embody/framework/cloud-contracts",
+      "@embody/core": "file:.embody/framework/core",
+      "@embody/gateway": "file:.embody/framework/gateway",
+      "@embody/genui": "file:.embody/framework/genui",
+      "@embody/host": "file:.embody/framework/host",
+      "@embody/mcp": "file:.embody/framework/mcp",
+      "@embody/storage": "file:.embody/framework/storage",
+      "@embody/testing": "file:.embody/framework/testing"
+    }
+  },
+  "scripts": {
+    "dev:gateway": "pnpm build && pnpm --filter @embody-apps/kanban exec node scripts/dev-gateway.mjs",
+    "build": "pnpm -r --if-present run build",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "test": "pnpm -r --if-present run test",
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm --filter @embody-apps/kanban test:gateway"
+  }
+}

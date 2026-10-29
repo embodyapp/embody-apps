@@ -1,0 +1,33 @@
+{
+  "name": "@embody-apps/crm",
+  "private": true,
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm build && embody dev dist/embody.config.js",
+    "build": "pnpm --filter @embody-apps/codex-theme build && tsc -p tsconfig.build.json && node scripts/build-presentation.mjs",
+    "typecheck": "pnpm --filter @embody-apps/codex-theme build && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && vitest run",
+    "prestart": "pnpm build",
+    "start": "node --env-file-if-exists=.env dist/src/index.js"
+  },
+  "dependencies": {
+    "@embody-apps/codex-theme": "workspace:*",
+    "@embody/cli": "^0.1.0",
+    "@embody/core": "^0.1.0",
+    "@embody/host": "^0.1.0",
+    "@embody/genui": "0.0.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@embody/testing": "^0.1.0",
+    "@types/node": "^22.20.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18",
+    "esbuild": "0.28.2"
+  }
+}

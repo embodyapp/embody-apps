@@ -1,0 +1,40 @@
+import { afterEach, beforeEach, expect, it } from "vitest";
+import { createTestHarness, type TestHarness } from "@embody/testing";
+import config from "../embody.config.js";
+let h: TestHarness;
+beforeEach(async () => { h = await createTestHarness({ plugins: config.plugins }); });
+afterEach(async () => { await h.close(); });
+const project = async (name: string) => await h.call("tracker.project.create", { data: { name, description: "Preserve" } }) as { id: string };
+const task = async (projectId: string, data: Record<string, unknown> = {}) => await h.call("tracker.task.create", { data: { projectId, title: "Work", definitionOfDone: "Verified", ...data } }) as { id: string };
+it("rejects missing or blank required text and invalid statuses on create and update", async () => {
+  await expect(h.call("tracker.project.create", { data: { name: "  " } })).rejects.toThrow("invalid");
+  await expect(h.call("tracker.project.create", { data: {} })).rejects.toThrow("invalid");
+  const p = await project("Project");
+  for (const data of [{ title: " " }, { definitionOfDone: " " }, { definitionOfDone: undefined }, { status: "blocked" }]) await expect(task(p.id, data)).rejects.toThrow("invalid");
+  const t = await task(p.id);
+  for (const data of [{ title: " " }, { definitionOfDone: " " }, { status: "blocked" }]) await expect(h.call("tracker.task.update", { id: t.id, data })).rejects.toThrow("invalid");
+  await expect(h.call("tracker.addComment", { taskId: t.id, body: " " })).rejects.toThrow("invalid");
+  await expect(h.call("tracker.comment.create", { data: { taskId: t.id, body: " " } })).rejects.toThrow("invalid");
+  await expect(h.call("tracker.addComment", { taskId: "00000000-0000-4000-8000-000000000000", body: "Missing" })).rejects.toThrow("not found");
+});
+it("partial updates never reset omitted defaults or relationships", async () => {
+  const p = await project("Project"); const parent = await task(p.id);
+  const t = await task(p.id, { parentTaskId: parent.id, blockerIds: [parent.id], description: "Keep", status: "in_progress" });
+  await h.call("tracker.task.update", { id: t.id, data: { title: "Renamed" } });
+  expect(await h.call("tracker.task.get", { id: t.id })).toMatchObject({ data: { title: "Renamed", status: "in_progress", description: "Keep", parentTaskId: parent.id, blockerIds: [parent.id] } });
+  await h.call("tracker.project.update", { id: p.id, data: { name: "Renamed" } });
+  expect(await h.call("tracker.project.get", { id: p.id })).toMatchObject({ data: { description: "Preserve" } });
+});
+it("project filters and paginated child reads isolate projects without missing records", async () => {
+  const p = await project("A"); const q = await project("B");
+  const parent = await task(p.id); const foreign = await task(q.id);
+  const children = [];
+  for (let i = 0; i < 25; i++) children.push(await task(p.id, { parentTaskId: parent.id }));
+  const found = [];
+  for (let offset = 0; offset < 25; offset += 10) found.push(...await h.call("tracker.task.list", { filter: { projectId: p.id, parentTaskId: parent.id }, limit: 10, offset }) as { id: string }[]);
+  expect(new Set(found.map(r => r.id))).toEqual(new Set(children.map(r => r.id)));
+  expect(await h.call("tracker.task.list", { filter: { projectId: q.id } })).toMatchObject([{ id: foreign.id }]);
+  const other = h.as({ ...h.principal, orgId: "foreign" });
+  expect(await other.call("tracker.task.list", { filter: { projectId: p.id } })).toEqual([]);
+  await expect(other.call("tracker.task.get", { id: parent.id })).rejects.toThrow("not found");
+});

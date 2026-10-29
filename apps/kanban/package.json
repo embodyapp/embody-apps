@@ -1,0 +1,40 @@
+{
+  "name": "@embody-apps/kanban",
+  "private": true,
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm build && embody dev dist/embody.config.js",
+    "dev:gateway": "pnpm --filter @embody-apps/crm build && pnpm build && node scripts/dev-gateway.mjs",
+    "build": "pnpm --filter @embody-apps/codex-theme build && tsc -p tsconfig.build.json && node scripts/build-presentation.mjs",
+    "typecheck": "pnpm --filter @embody-apps/codex-theme build && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && vitest run",
+    "test:gateway": "pnpm --filter @embody-apps/crm build && pnpm build && vitest run --config vitest.gateway.config.ts",
+    "test:browser": "pnpm --filter @embody-apps/crm build && pnpm build && vitest run --config vitest.browser.config.ts",
+    "prestart": "pnpm build",
+    "start": "node --env-file-if-exists=.env dist/src/index.js"
+  },
+  "dependencies": {
+    "@embody-apps/codex-theme": "workspace:*",
+    "@embody/cli": "^0.1.0",
+    "@embody/core": "^0.1.0",
+    "@embody/genui": "0.0.0",
+    "@embody/host": "^0.1.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@embody/auth": "0.1.0",
+    "@embody/gateway": "0.1.0",
+    "@embody/testing": "^0.1.0",
+    "@types/node": "^22.20.1",
+    "esbuild": "0.28.2",
+    "playwright": "1.58.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
